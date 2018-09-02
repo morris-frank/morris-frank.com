@@ -1,0 +1,12 @@
+# morris.jetzt
+
+## Installation
+
+```bash
+sudo pacman -S yarn ruby-sass make
+```
+
+```bash
+yarn install
+make public
+```
