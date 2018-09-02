@@ -6,6 +6,6 @@ help:
 	@echo '                                                                          '
 
 public:
-	sass sass/main.sass main.css
+	sass sass/main.sass docs/main.css
 
 .PHONY: help public
