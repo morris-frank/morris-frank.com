@@ -1,5 +1,26 @@
-.hero:hover
-    padding-bottom: 30vh
+.hero
+    overflow: hidden
+    +tablet
+        &:hover
+            padding-bottom: 15vh
+    .navbar-item
+        position: relative
+        padding-left: 1em
+        &:not(:first-child)::before
+            position: absolute
+            left: 0.4rem
+            content: '×'
+        +tablet
+            &::after
+                display: none
+                position: absolute
+                left: 0
+                bottom: -35vh
+                font-size: 35vh
+                content: attr(title)
+            &:hover
+                &::after
+                    display: block
 
 .content
     h1
