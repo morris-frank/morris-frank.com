@@ -1,3 +1,11 @@
+::-moz-selection
+    background: $primary
+    color: $primary-invert
+
+::selection
+    background: $primary
+    color: $primary-invert
+
 .hero
     overflow: hidden
     +tablet
@@ -38,3 +46,12 @@
             position: absolute
             left: 0
             content: '×'
+
+footer.footer
+    $odd-stripe: lighten($primary, 5)
+    background: linear-gradient(135deg, $odd-stripe 25%, transparent 25%) -50px 0, linear-gradient(225deg, $odd-stripe 25%, transparent 25%) -50px 0, linear-gradient(315deg, $odd-stripe 25%, transparent 25%), linear-gradient(45deg, $odd-stripe 25%, transparent 25%)
+    background-size: 100px 100px
+    background-color: $primary
+
+.heading
+    font-size: $size-6

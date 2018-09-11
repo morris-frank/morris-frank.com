@@ -1028,7 +1028,7 @@ a.has-text-danger:hover, a.has-text-danger:focus {
 .box {
   background-color: #f2f2f2;
   border-radius: 0;
-  box-shadow: 4px 4px 0px 8px #a9384a;
+  box-shadow: 0 2px 3px rgba(48, 48, 48, 0.1), 0 0 0 1px rgba(48, 48, 48, 0.1);
   color: #4a4a4a;
   display: block;
   padding: 1.25rem; }
@@ -6355,6 +6355,14 @@ label.panel-block {
   background-color: #f2f2f2;
   padding: 3rem 1.5rem 6rem; }
 
+::-moz-selection {
+  background: #a9384a;
+  color: #fff; }
+
+::selection {
+  background: #a9384a;
+  color: #fff; }
+
 .hero {
   overflow: hidden; }
   @media screen and (min-width: 769px), print {
@@ -6391,5 +6399,13 @@ label.panel-block {
     position: absolute;
     left: 0;
     content: "×"; }
+
+footer.footer {
+  background: linear-gradient(135deg, #bc3e52 25%, transparent 25%) -50px 0, linear-gradient(225deg, #bc3e52 25%, transparent 25%) -50px 0, linear-gradient(315deg, #bc3e52 25%, transparent 25%), linear-gradient(45deg, #bc3e52 25%, transparent 25%);
+  background-size: 100px 100px;
+  background-color: #a9384a; }
+
+.heading {
+  font-size: 1rem; }
 
 /*# sourceMappingURL=main.css.map */
