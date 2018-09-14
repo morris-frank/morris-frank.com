@@ -3,10 +3,10 @@
 ## Installation
 
 ```bash
-sudo pacman -S yarn ruby-sass make
+sudo pacman -S yarn ruby-sass
 ```
 
 ```bash
 yarn install
-make public
+./build.pl
 ```
