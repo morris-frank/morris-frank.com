@@ -4,6 +4,7 @@ use strict;
 use warnings;
 use File::Basename;
 use Term::ANSIColor;
+use File::Copy;
 
 my $dir_content = 'content/';
 my $dir_output = 'docs/';
@@ -15,7 +16,7 @@ exit;
 
 sub process_sass {
     print colored( '    Processing SASS', 'yellow' ), "\n";
-    system("sass $dir_layout/main.sass $dir_output/main.css");
+    system("node_modules/.bin/sass $dir_layout/main.sass $dir_output/main.css");
     print colored( 'Processed SASS', 'green' ), "\n";
 }
 
@@ -37,19 +38,23 @@ sub process_content_file {
     my $output = read_file($dir_layout . 'skeleton.html');
 
     my $title = "";
-    if ($content =~ m/<h1>([^>]+)<\/h1>/i ) {
+    if ($content =~ m/<h1[^>]+>([^<]+)<\/h1>/i ) {
         $title = $1;
     }
 
     $output =~ s/\{\{CONTENT\}\}/$content/g;
     $output =~ s/\{\{TITLE\}\}/$title/g;
 
+    my $output_file = "";
     if ($basename eq "index") {
-        write_file("$dir_output$basename.html", $output);
+        $output_file = "$dir_output$basename.html";
     } else {
         mkdir($dir_output . $basename);
-        write_file("$dir_output$basename/index.html", $output);
+        $output_file = "$dir_output$basename/index.html";
     }
+    write_file($output_file, $output);
+    system("node_modules/.bin/js-beautify $output_file > $output_file.bak");
+    move("$output_file.bak", $output_file);
 }
 
 sub read_file {
