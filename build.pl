@@ -38,8 +38,10 @@ sub process_content_file {
     my $output = read_file($dir_layout . 'skeleton.html');
 
     my $title = "";
-    if ($content =~ m/<h1[^>]+>([^<]+)<\/h1>/i ) {
+    if ($content =~ m/<h1[^>]*>([^<]+)<\/h1>/i ) {
         $title = $1;
+    } else {
+        $title = $basename;
     }
 
     $output =~ s/\{\{CONTENT\}\}/$content/g;
