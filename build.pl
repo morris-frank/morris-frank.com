@@ -30,7 +30,7 @@ sub process_content_files {
 
 sub process_content_file {
     my ($input_file) = @_;
-    my $basename = basename($input_file);
+    my $basename = basename($input_file, ".html");
     print colored( "    Processing $basename", 'yellow' ), "\n";
 
     my $content = read_file($input_file);
@@ -44,7 +44,12 @@ sub process_content_file {
     $output =~ s/\{\{CONTENT\}\}/$content/g;
     $output =~ s/\{\{TITLE\}\}/$title/g;
 
-    write_file($dir_output . $basename, $output);
+    if ($basename eq "index") {
+        write_file("$dir_output$basename.html", $output);
+    } else {
+        mkdir($dir_output . $basename);
+        write_file("$dir_output$basename/index.html", $output);
+    }
 }
 
 sub read_file {
