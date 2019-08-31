@@ -6,37 +6,36 @@ use File::Basename;
 use Term::ANSIColor;
 use File::Copy;
 
-my $dir_content = 'content/';
-my $dir_output = 'docs/';
-my $dir_layout = 'layout/';
+my $input_directory = 'content/';
+my $output_directory = 'docs/';
+my $layout_directory = 'layout/';
 
-process_content_files();
-process_sass();
+build();
 exit;
 
-sub process_sass {
-    print colored( '    Processing SASS', 'yellow' ), "\n";
-    system("node_modules/.bin/sass $dir_layout/main.sass $dir_output/main.css");
-    print colored( 'Processed SASS', 'green' ), "\n";
+sub build {
+    process_content_files($input_directory, $layout_directory, $output_directory);
+    process_sass($layout_directory, $output_directory);
 }
 
 sub process_content_files {
-    my @input_list = glob "$dir_content*html";
+    my ($input_dir, $layout_dir, $output_dir) = @_;
+    my @input_list = glob "$input_dir*html";
+
+    my $skeleton_file = read_file($layout_dir . 'skeleton.html');
 
     foreach my $input_file (@input_list) {
-        process_content_file($input_file);
+        process_content_file($input_file, $skeleton_file, $output_dir);
     }
     print colored( "Processed all content", 'green' ), "\n";
 }
 
 sub process_content_file {
-    my ($input_file) = @_;
+    my ($input_file, $skeleton, $output_dir) = @_;
     my $basename = basename($input_file, ".html");
     print colored( "    Processing $basename", 'yellow' ), "\n";
 
     my $content = read_file($input_file);
-    my $output = read_file($dir_layout . 'skeleton.html');
-
     my $title = "";
     if ($content =~ m/<h1[^>]*>([^<]+)<\/h1>/i ) {
         $title = $1;
@@ -44,19 +43,36 @@ sub process_content_file {
         $title = $basename;
     }
 
+    my $output = $skeleton;
     $output =~ s/\{\{CONTENT\}\}/$content/g;
     $output =~ s/\{\{TITLE\}\}/$title/g;
 
     my $output_file = "";
     if ($basename eq "index") {
-        $output_file = "$dir_output$basename.html";
+        $output_file = "$output_dir$basename.html";
     } else {
-        mkdir($dir_output . $basename);
-        $output_file = "$dir_output$basename/index.html";
+        mkdir($output_dir . $basename);
+        $output_file = "$output_dir$basename/index.html";
     }
     write_file($output_file, $output);
-    system("node_modules/.bin/js-beautify $output_file > $output_file.bak");
-    move("$output_file.bak", $output_file);
+
+    beautify_file($output_file)
+}
+
+sub beautify_file {
+    # Beautifies an HTML source file
+    # :param filename
+    my ($filename)  = @_;
+
+    system("node_modules/.bin/js-beautify $filename > $filename.bak");
+    move("$filename.bak", $filename);
+}
+
+sub process_sass {
+    my ($layout_dir, $output_dir) = @_;
+    print colored( '    Processing SASS', 'yellow' ), "\n";
+    system("node_modules/.bin/sass $layout_dir/main.sass $output_dir/main.css");
+    print colored( 'Processed SASS', 'green' ), "\n";
 }
 
 sub read_file {
