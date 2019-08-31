@@ -8463,11 +8463,6 @@ label.panel-block:hover {
 .hero {
   overflow: hidden;
 }
-@media screen and (min-width: 769px), print {
-  .hero:hover {
-    padding-bottom: 15vh;
-  }
-}
 .hero .navbar-item {
   position: relative;
   padding-left: 1em;
@@ -8476,19 +8471,6 @@ label.panel-block:hover {
   position: absolute;
   left: 0.4rem;
   content: "×";
-}
-@media screen and (min-width: 769px), print {
-  .hero .navbar-item::after {
-    display: none;
-    position: absolute;
-    left: 0;
-    bottom: -35vh;
-    font-size: 35vh;
-    content: attr(title);
-  }
-  .hero .navbar-item:hover::after {
-    display: block;
-  }
 }
 
 .content h1 {
