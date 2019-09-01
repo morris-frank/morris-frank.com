@@ -5,6 +5,7 @@ use warnings;
 use File::Basename;
 use Term::ANSIColor;
 use File::Copy;
+use Digest::MD5 qw(md5_hex);
 
 my $input_directory = 'content/';
 my $output_directory = 'docs/';
@@ -70,9 +71,9 @@ sub beautify_file {
 
 sub process_sass {
     my ($layout_dir, $output_dir) = @_;
-    print colored( '    Processing SASS', 'yellow' ), "\n";
-    system("node_modules/.bin/sass $layout_dir/main.sass $output_dir/main.css");
-    print colored( 'Processed SASS', 'green' ), "\n";
+    print colored( "    Processing ${layout_dir}main.sass", 'yellow' ), "\n";
+    system("node_modules/.bin/sass ${layout_dir}main.sass ${output_dir}main.css");
+    print colored( "Built ${output_dir}main.css", 'green' ), "\n";
 }
 
 sub read_file {

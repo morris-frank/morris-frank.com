@@ -1,6 +1,6 @@
 {
-  "name": "morris.jetzt",
-  "repository": "git@github.com:morris-frank/morris-frank.github.io.git",
+  "name": "morris-frank.dev",
+  "repository": "git@github.com:morris-frank/morris-frank.dev.git",
   "author": "Maurice Frank <maurice.frank@posteo.de>",
   "license": "MIT",
   "dependencies": {
