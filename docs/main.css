@@ -3433,7 +3433,7 @@ a.tag:hover {
 
 .title {
   color: #303030;
-  font-size: 2rem;
+  font-size: 1.25rem;
   font-weight: 600;
   line-height: 1.125;
 }
@@ -4259,7 +4259,7 @@ a.list-item {
 
 .navbar {
   background-color: #f2f2f2;
-  min-height: 3.25rem;
+  min-height: 2rem;
   position: relative;
   z-index: 30;
 }
@@ -4826,7 +4826,7 @@ a.list-item {
 .navbar > .container {
   align-items: stretch;
   display: flex;
-  min-height: 3.25rem;
+  min-height: 2rem;
   width: 100%;
 }
 .navbar.has-shadow {
@@ -4850,11 +4850,11 @@ a.list-item {
 
 html.has-navbar-fixed-top,
 body.has-navbar-fixed-top {
-  padding-top: 3.25rem;
+  padding-top: 2rem;
 }
 html.has-navbar-fixed-bottom,
 body.has-navbar-fixed-bottom {
-  padding-bottom: 3.25rem;
+  padding-bottom: 2rem;
 }
 
 .navbar-brand,
@@ -4862,7 +4862,7 @@ body.has-navbar-fixed-bottom {
   align-items: stretch;
   display: flex;
   flex-shrink: 0;
-  min-height: 3.25rem;
+  min-height: 2rem;
 }
 
 .navbar-brand a.navbar-item:focus, .navbar-brand a.navbar-item:hover {
@@ -4880,9 +4880,9 @@ body.has-navbar-fixed-bottom {
   color: #4a4a4a;
   cursor: pointer;
   display: block;
-  height: 3.25rem;
+  height: 2rem;
   position: relative;
-  width: 3.25rem;
+  width: 2rem;
   margin-left: auto;
 }
 .navbar-burger span {
@@ -4967,7 +4967,7 @@ a.navbar-item:focus, a.navbar-item:focus-within, a.navbar-item:hover, a.navbar-i
 }
 .navbar-item.is-tab {
   border-bottom: 1px solid transparent;
-  min-height: 3.25rem;
+  min-height: 2rem;
   padding-bottom: calc(0.5rem - 1px);
 }
 .navbar-item.is-tab:focus, .navbar-item.is-tab:hover {
@@ -5056,17 +5056,17 @@ a.navbar-item:focus, a.navbar-item:focus-within, a.navbar-item:hover, a.navbar-i
   }
   .navbar.is-fixed-top .navbar-menu, .navbar.is-fixed-top-touch .navbar-menu {
     -webkit-overflow-scrolling: touch;
-    max-height: calc(100vh - 3.25rem);
+    max-height: calc(100vh - 2rem);
     overflow: auto;
   }
 
   html.has-navbar-fixed-top-touch,
 body.has-navbar-fixed-top-touch {
-    padding-top: 3.25rem;
+    padding-top: 2rem;
   }
   html.has-navbar-fixed-bottom-touch,
 body.has-navbar-fixed-bottom-touch {
-    padding-bottom: 3.25rem;
+    padding-bottom: 2rem;
   }
 }
 @media screen and (min-width: 769px) {
@@ -5079,7 +5079,7 @@ body.has-navbar-fixed-bottom-touch {
   }
 
   .navbar {
-    min-height: 3.25rem;
+    min-height: 2rem;
   }
   .navbar.is-spaced {
     padding: 1rem 2rem;
@@ -5238,19 +5238,19 @@ body.has-navbar-fixed-bottom-touch {
 
   html.has-navbar-fixed-top-desktop,
 body.has-navbar-fixed-top-desktop {
-    padding-top: 3.25rem;
+    padding-top: 2rem;
   }
   html.has-navbar-fixed-bottom-desktop,
 body.has-navbar-fixed-bottom-desktop {
-    padding-bottom: 3.25rem;
+    padding-bottom: 2rem;
   }
   html.has-spaced-navbar-fixed-top,
 body.has-spaced-navbar-fixed-top {
-    padding-top: 5.25rem;
+    padding-top: 4rem;
   }
   html.has-spaced-navbar-fixed-bottom,
 body.has-spaced-navbar-fixed-bottom {
-    padding-bottom: 5.25rem;
+    padding-bottom: 4rem;
   }
 
   a.navbar-item.is-active,
@@ -5267,7 +5267,7 @@ body.has-spaced-navbar-fixed-bottom {
   }
 }
 .hero.is-fullheight-with-navbar {
-  min-height: calc(100vh - 3.25rem);
+  min-height: calc(100vh - 2rem);
 }
 
 .pagination {
@@ -8129,38 +8129,29 @@ label.panel-block:hover {
   color: #fff;
 }
 
-a {
-  position: relative;
-}
-a:hover::before {
-  height: 3px;
-  bottom: -1px;
-}
-a::before {
-  z-index: -1;
-  content: "";
-  position: absolute;
-  width: 100%;
-  height: 2px;
-  bottom: 0;
-  left: 0;
-  background: #689D6A;
-}
-
-.hero {
-  overflow: hidden;
-}
-.hero .navbar-item {
-  position: relative;
-  padding-left: 1em;
+.hero .navbar-item:first-child {
+  padding-left: 0;
 }
 
 .content h1 {
   background-image: linear-gradient(141deg, #3d6837 0%, #689D6A 71%, #82b68d 100%);
   -webkit-background-clip: text;
   color: transparent;
-  font-size: 3em;
+  font-size: 2em;
   display: inline-block;
+}
+.content h3 {
+  font-size: 1.25em;
+}
+.content a {
+  background-image: linear-gradient(#689D6A, #689D6A);
+  background-size: 1px 2px;
+  background-repeat: repeat-x;
+  background-position: 0 90%;
+  position: relative;
+}
+.content a:hover {
+  background-size: 1px 0.3em;
 }
 
 footer.footer {

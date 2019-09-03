@@ -15,22 +15,24 @@
 <body>
     <section class="hero is-primary is-bold">
         <div class="hero-head">
-            <div class="navbar">
+            <div class="navbar container">
                 <div class="navbar-start">
                     <a href="/" class="navbar-item">
-                        <h1 class="title">morris-frank.dev</h1>
+                        <h1 class="title">Morris Frank</h1>
                     </a>
                     <a class="navbar-item" title="travel">travel</a>
                     <a class="navbar-item" title="works">portfolio</a>
-                    <a class="navbar-item" title="cv">cv</a>
+                    <a class="navbar-item" href="{{ROOT}}resume.pdf">cv</a>
                 </div>
             </div>
         </div>
     </section>
 
     <section class="section">
-        <div class="container content">
-            {{CONTENT}}
+        <div class="container">
+            <div class="content">
+                {{CONTENT}}
+            </div>
         </div>
     </section>
 
