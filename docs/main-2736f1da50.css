@@ -3433,7 +3433,7 @@ a.tag:hover {
 
 .title {
   color: #303030;
-  font-size: 1.25rem;
+  font-size: 1.8rem;
   font-weight: 600;
   line-height: 1.125;
 }
@@ -8130,7 +8130,7 @@ label.panel-block:hover {
 }
 
 .hero .navbar-item:first-child {
-  padding-left: 0;
+  padding: 0;
 }
 
 .content h1 {
