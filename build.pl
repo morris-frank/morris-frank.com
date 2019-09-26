@@ -54,7 +54,7 @@ sub process_content_file {
 
     my $content = read_file($input_file);
     my $title = "";
-    if ($content =~ m/<h1[^>]*>([^<]+)<\/h1>/i ) {
+    if ($content =~ m/<h2[^>]*>([^<]+)<\/h2>/i ) {
         $title = $1;
     } else {
         $title = $basename;
