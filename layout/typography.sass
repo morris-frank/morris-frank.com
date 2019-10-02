@@ -34,6 +34,20 @@ p
 blockquote
   font-size: 0.95rem
   line-height: 1.25
+  border-left: 4px solid $primary
+  margin: 0
+  padding: 0.4em 2em
+  position: relative
+
+blockquote:before
+  display: block
+  content: '“'
+  position: absolute
+  color: rgba($primary, 0.4)
+  top: 2.1rem
+  left: -0.2rem
+  font-size: 5rem
+  line-height: 0
 
 a
   text-decoration: none
@@ -53,6 +67,7 @@ footer h2
 h3
   font-size: 1.2rem
   font-weight: bold
+  margin: 2rem 0 -0.4rem 0
 
 h4
   font-size: 1.2rem

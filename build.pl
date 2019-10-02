@@ -88,14 +88,16 @@ sub beautify_file {
 
 sub process_sass {
     my ($layout_dir, $output_dir) = @_;
-    print colored( "    Processing ${layout_dir}main.sass", 'yellow' ), "\n";
+    print colored("    Deleting old main.css", 'red'), "\n";
+    unlink glob "${output_dir}main-*.css";
+    print colored("    Processing ${layout_dir}main.sass", 'yellow' ), "\n";
     system("node_modules/.bin/sass ${layout_dir}main.sass ${output_dir}main.css");
 
     my $fingerprint = substr(hash_file("${output_dir}main.css"), 0, 10);
     my $save_name = "main-${fingerprint}.css";
 
     move("${output_dir}main.css", "${output_dir}${save_name}");
-    print colored( "⇐ Built ${output_dir}main.css", 'green' ), "\n";
+    print colored( "⇐ Built ${output_dir}${save_name}", 'green' ), "\n";
     return $save_name;
 }
 
