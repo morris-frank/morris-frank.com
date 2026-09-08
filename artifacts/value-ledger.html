@@ -1,0 +1,763 @@
+<title>The Value Ledger</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+  :root{
+    --paper:#E8EFE3;
+    --paper-raised:#DEE8D7;
+    --ink:#16241B;
+    --ink-soft:#3C4C40;
+    --ink-faint:#5E6E60;
+    --rule:#6E8F76;
+    --rule-soft:#B7CAB6;
+    --accent:#A22E1D;
+    --accent-strong:#7C2013;
+    --accent-soft:#F0DDD1;
+    --accent-ink:#5A160C;
+    --chip-bg:#DCE7D6;
+    --shadow: 0 1px 0 rgba(22,36,27,0.08);
+    --font-serif:'Spectral', Georgia, 'Times New Roman', serif;
+    --font-mono:'IBM Plex Mono', ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --paper:#111A12;
+      --paper-raised:#182219;
+      --ink:#DCE7D6;
+      --ink-soft:#A9BCA9;
+      --ink-faint:#7E9280;
+      --rule:#3F5A46;
+      --rule-soft:#2A3B2D;
+      --accent:#DC7752;
+      --accent-strong:#F09168;
+      --accent-soft:#2E211B;
+      --accent-ink:#F2C5AC;
+      --chip-bg:#1C2A1E;
+      --shadow: 0 1px 0 rgba(0,0,0,0.35);
+    }
+  }
+  :root[data-theme="dark"]{
+    --paper:#111A12;
+    --paper-raised:#182219;
+    --ink:#DCE7D6;
+    --ink-soft:#A9BCA9;
+    --ink-faint:#7E9280;
+    --rule:#3F5A46;
+    --rule-soft:#2A3B2D;
+    --accent:#DC7752;
+    --accent-strong:#F09168;
+    --accent-soft:#2E211B;
+    --accent-ink:#F2C5AC;
+    --chip-bg:#1C2A1E;
+    --shadow: 0 1px 0 rgba(0,0,0,0.35);
+  }
+
+  *{box-sizing:border-box;}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:var(--font-serif);
+    margin:0;
+    line-height:1.6;
+  }
+  ::selection{ background:var(--accent-soft); color:var(--accent-ink); }
+
+  a{ color:var(--accent-strong); }
+  a:focus-visible, button:focus-visible, input:focus-visible, .node-hit:focus-visible{
+    outline:2px solid var(--accent);
+    outline-offset:2px;
+  }
+
+  .mono{ font-family:var(--font-mono); }
+  .eyebrow{
+    font-family:var(--font-mono);
+    font-size:0.72rem;
+    letter-spacing:0.14em;
+    text-transform:uppercase;
+    color:var(--ink-faint);
+  }
+
+  /* ---------- layout shell ---------- */
+  .page{
+    max-width:760px;
+    margin:0 auto;
+    padding:64px 24px 120px;
+  }
+
+  /* ---------- nav rail ---------- */
+  .rail{
+    position:fixed;
+    left:18px;
+    top:50%;
+    transform:translateY(-50%);
+    display:flex;
+    flex-direction:column;
+    gap:2px;
+    z-index:20;
+  }
+  .rail a{
+    font-family:var(--font-mono);
+    font-size:0.68rem;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    text-decoration:none;
+    color:var(--ink-soft);
+    background:var(--paper-raised);
+    border:1px solid var(--rule-soft);
+    border-left:3px solid transparent;
+    padding:7px 10px;
+    white-space:nowrap;
+    transition:border-color .15s ease, color .15s ease;
+  }
+  .rail a:hover{ color:var(--ink); }
+  .rail a.active{
+    border-left-color:var(--accent);
+    color:var(--accent-strong);
+  }
+  @media (max-width:900px){
+    .rail{
+      position:sticky;
+      left:auto;
+      top:0;
+      transform:none;
+      flex-direction:row;
+      overflow-x:auto;
+      gap:0;
+      background:var(--paper);
+      border-bottom:1px solid var(--rule-soft);
+      padding:8px 12px;
+      margin:0 0 8px;
+    }
+    .rail a{ border:none; border-bottom:3px solid transparent; padding:6px 10px; }
+    .rail a.active{ border-bottom-color:var(--accent); border-left-color:transparent; }
+    .page{ padding-top:8px; }
+  }
+
+  /* ---------- title block ---------- */
+  header.titlepage{ text-align:center; padding-bottom:28px; }
+  header.titlepage .imprint-eyebrow{ margin-bottom:18px; }
+  header.titlepage h1{
+    font-family:var(--font-serif);
+    font-weight:600;
+    font-style:italic;
+    font-size:clamp(2.4rem, 6vw, 3.4rem);
+    margin:0 0 6px;
+    text-wrap:balance;
+    letter-spacing:0.01em;
+  }
+  header.titlepage .subtitle{
+    font-family:var(--font-mono);
+    font-size:0.82rem;
+    letter-spacing:0.05em;
+    text-transform:uppercase;
+    color:var(--ink-soft);
+    margin:0 0 22px;
+  }
+  .double-rule{
+    height:5px;
+    margin:0 auto 22px;
+    max-width:420px;
+    background:
+      linear-gradient(var(--rule), var(--rule)) top / 100% 1px no-repeat,
+      linear-gradient(var(--rule), var(--rule)) bottom / 100% 1px no-repeat;
+  }
+  header.titlepage .abstract{
+    max-width:560px;
+    margin:0 auto;
+    color:var(--ink-soft);
+    font-size:1.02rem;
+  }
+  header.titlepage .imprint{
+    margin-top:22px;
+    font-family:var(--font-mono);
+    font-size:0.7rem;
+    color:var(--ink-faint);
+    letter-spacing:0.04em;
+  }
+
+  .note{
+    position:relative;
+    margin:34px 0;
+    padding:16px 18px 16px 20px;
+    background:var(--accent-soft);
+    border-left:3px solid var(--accent);
+    color:var(--accent-ink);
+    font-size:0.92rem;
+  }
+  .note .note-tag{
+    font-family:var(--font-mono);
+    font-size:0.66rem;
+    letter-spacing:0.12em;
+    text-transform:uppercase;
+    display:block;
+    margin-bottom:6px;
+    opacity:0.85;
+  }
+
+  /* ---------- folio sections ---------- */
+  section.folio{ margin-top:76px; scroll-margin-top:24px; }
+  .folio-head{
+    display:flex;
+    align-items:baseline;
+    gap:14px;
+    border-bottom:1px solid var(--rule);
+    padding-bottom:10px;
+    margin-bottom:22px;
+  }
+  .folio-head .num{
+    font-family:var(--font-mono);
+    font-size:0.78rem;
+    letter-spacing:0.1em;
+    color:var(--accent-strong);
+    white-space:nowrap;
+  }
+  .folio-head h2{
+    font-family:var(--font-serif);
+    font-weight:600;
+    font-size:1.5rem;
+    margin:0;
+  }
+  .folio > p.lede{ color:var(--ink-soft); max-width:64ch; }
+
+  /* ---------- figure / diagram ---------- */
+  figure.diagram{ margin:28px 0 8px; }
+  figure.diagram svg{ width:100%; height:auto; display:block; }
+  figure.diagram figcaption{
+    margin-top:12px;
+    font-size:0.88rem;
+    color:var(--ink-soft);
+    max-width:64ch;
+  }
+  .node-hit{ cursor:pointer; }
+  .node-hit rect{ transition:filter .15s ease; }
+  .node-hit:hover rect, .node-hit:focus-visible rect{ filter:brightness(0.94); }
+  :root[data-theme="dark"] .node-hit:hover rect, :root[data-theme="dark"] .node-hit:focus-visible rect{ filter:brightness(1.28); }
+  @media (prefers-color-scheme:dark){ :root:not([data-theme="light"]) .node-hit:hover rect{ filter:brightness(1.28); } }
+
+  .flash{ animation:flash-hl 1.1s ease; }
+  @keyframes flash-hl{
+    0%{ background:var(--accent-soft); }
+    100%{ background:transparent; }
+  }
+  @media (prefers-reduced-motion:reduce){ .flash{ animation:none; } }
+
+  /* ---------- structural index ---------- */
+  .toc{ border-top:1px solid var(--rule-soft); }
+  .toc-part{ border-bottom:1px solid var(--rule-soft); padding:14px 0; display:grid; grid-template-columns:64px 1fr; gap:4px 16px; }
+  .toc-part .roman{ font-family:var(--font-mono); font-size:0.92rem; color:var(--accent-strong); padding-top:2px; }
+  .toc-part h3{ font-family:var(--font-serif); font-size:1.06rem; font-weight:600; margin:0 0 6px; grid-column:2; }
+  .toc-part .roman + h3{ grid-column:2; }
+  .toc-part .chapters{ grid-column:2; margin:0; padding:0; list-style:none; color:var(--ink-soft); font-size:0.9rem; display:flex; flex-wrap:wrap; gap:6px 0; }
+  .toc-part .chapters li{ }
+  .toc-part .chapters li:not(:last-child)::after{ content:"·"; margin:0 8px; color:var(--rule); }
+
+  /* ---------- glossary ---------- */
+  .glossary-tools{ display:flex; align-items:center; gap:10px; margin-bottom:18px; }
+  .glossary-tools input{
+    flex:1;
+    font-family:var(--font-serif);
+    font-size:0.98rem;
+    padding:10px 12px;
+    background:var(--paper-raised);
+    border:1px solid var(--rule-soft);
+    color:var(--ink);
+  }
+  .glossary-tools input:focus{ outline:none; border-color:var(--accent); }
+  .glossary-count{ font-family:var(--font-mono); font-size:0.72rem; color:var(--ink-faint); white-space:nowrap; }
+
+  dl.glossary{ margin:0; border-top:1px solid var(--rule-soft); }
+  dl.glossary .entry{ border-bottom:1px solid var(--rule-soft); }
+  dl.glossary .entry-head{
+    width:100%;
+    display:flex;
+    align-items:baseline;
+    gap:12px;
+    justify-content:space-between;
+    background:none;
+    border:none;
+    text-align:left;
+    padding:13px 2px;
+    cursor:pointer;
+    font-family:var(--font-serif);
+    color:var(--ink);
+  }
+  dl.glossary .entry-head dt{ font-weight:600; font-size:1.01rem; }
+  dl.glossary .entry-head .sym{ font-family:var(--font-mono); color:var(--ink-faint); font-size:0.85rem; transition:transform .15s ease; }
+  dl.glossary .entry[data-open="true"] .sym{ transform:rotate(45deg); }
+  dl.glossary dd{
+    margin:0;
+    padding:0 2px 16px;
+    color:var(--ink-soft);
+    font-size:0.95rem;
+    max-width:62ch;
+  }
+  dl.glossary dd .xref{ display:inline-block; margin-top:8px; }
+  .xref-chip{
+    font-family:var(--font-mono);
+    font-size:0.68rem;
+    letter-spacing:0.04em;
+    text-transform:uppercase;
+    background:var(--chip-bg);
+    color:var(--ink-soft);
+    border:1px solid var(--rule-soft);
+    padding:3px 7px;
+    margin:2px 4px 0 0;
+    display:inline-block;
+    text-decoration:none;
+    cursor:pointer;
+  }
+  .xref-chip:hover{ border-color:var(--accent); color:var(--accent-strong); }
+  .entry[hidden]{ display:none; }
+
+  /* ---------- quotes / entries ---------- */
+  .ledger-entries{ border-top:1px solid var(--rule-soft); }
+  .ledger-entry{
+    display:grid;
+    grid-template-columns:100px 1fr;
+    gap:4px 20px;
+    padding:20px 0;
+    border-bottom:1px solid var(--rule-soft);
+  }
+  .ledger-entry .cite{
+    font-family:var(--font-mono);
+    font-size:0.72rem;
+    color:var(--accent-strong);
+    line-height:1.5;
+  }
+  .ledger-entry blockquote{
+    margin:0;
+    font-size:1.05rem;
+    font-style:italic;
+  }
+  .ledger-entry .gloss{
+    grid-column:2;
+    margin:8px 0 0;
+    font-size:0.85rem;
+    color:var(--ink-faint);
+    font-style:normal;
+  }
+  @media (max-width:520px){
+    .ledger-entry{ grid-template-columns:1fr; }
+    .ledger-entry .gloss{ grid-column:1; }
+  }
+
+  footer.colophon{
+    margin-top:90px;
+    padding-top:18px;
+    border-top:1px solid var(--rule);
+    font-family:var(--font-mono);
+    font-size:0.7rem;
+    color:var(--ink-faint);
+    letter-spacing:0.02em;
+  }
+</style>
+
+<nav class="rail" aria-label="Folio navigation">
+  <a href="#context" data-target="context">Folio I · Provenance</a>
+  <a href="#map" data-target="map">Folio II · Mechanism</a>
+  <a href="#structure" data-target="structure">Folio III · Contents</a>
+  <a href="#glossary" data-target="glossary">Folio IV · Terms</a>
+  <a href="#quotes" data-target="quotes">Folio V · Entries</a>
+</nav>
+
+<div class="page">
+
+  <header class="titlepage">
+    <div class="eyebrow imprint-eyebrow">Das Kapital &middot; Kritik der politischen Oekonomie</div>
+    <h1>The Value Ledger</h1>
+    <p class="subtitle">A Reader's Compendium to Volume&nbsp;I &mdash; The Process of Capitalist Production</p>
+    <div class="double-rule"></div>
+    <p class="abstract">Karl Marx published only one volume of <em>Capital</em> in his lifetime. This compendium keeps to that volume: how it came to be written, the mechanism it argues for from the commodity to accumulation, its own table of contents, its working vocabulary, and a small set of its most-cited passages.</p>
+    <p class="imprint">Erster Band &middot; Hamburg: Otto Meissner, 1867 &middot; compendium prepared 2026</p>
+  </header>
+
+  <div class="note">
+    <span class="note-tag">Scope &amp; editions</span>
+    Covers Volume&nbsp;I only &mdash; the volume Marx saw through the press himself. Volumes&nbsp;II and&nbsp;III were assembled by Engels from Marx's manuscripts after his death and are outside this compendium's scope. Quotations follow the traditional Moore&nbsp;&amp;&nbsp;Aveling English translation; citations point to Part and Chapter rather than page numbers, since pagination differs across editions.
+  </div>
+
+  <!-- ================= FOLIO I ================= -->
+  <section class="folio" id="context">
+    <div class="folio-head"><span class="num">FOLIO&nbsp;I</span><h2>Provenance</h2></div>
+    <p class="lede">
+      Marx had been gathering material since the mid-1850s, filling notebooks in the British Museum's Reading Room with figures drawn from the Reports of the Inspectors of Factories &mdash; the Parliamentary Blue Books whose statistics supply much of Volume&nbsp;I's evidence on the working day, child labour, and factory discipline. Those years of preparatory drafting, including the long 1857&ndash;58 notebooks now known as the <em>Grundrisse</em>, were compressed into the book he finally sent to press.
+    </p>
+    <p class="lede">
+      <em>Das Kapital: Kritik der politischen Oekonomie, Erster Band</em> appeared in Hamburg in 1867 under Otto Meissner's imprint. Marx was living at 41 Maitland Park Road in north London at the time, his household kept afloat by Friedrich Engels, whose own earlier account of Manchester's mills, <em>The Condition of the Working Class in England</em>, fed directly into Volume&nbsp;I's descriptions of industry.
+    </p>
+    <p class="lede">
+      Marx intended two further volumes on the circulation and the totality of capitalist production. He did not live to finish either manuscript. Engels edited Marx's drafts into <em>Capital</em>, Volume&nbsp;II (1885) and Volume&nbsp;III (1894), both published after Marx's death in 1883 &mdash; which is why this compendium, keeping to material Marx himself prepared for print, stops at Volume&nbsp;I.
+    </p>
+  </section>
+
+  <!-- ================= FOLIO II ================= -->
+  <section class="folio" id="map">
+    <div class="folio-head"><span class="num">FOLIO&nbsp;II</span><h2>The Mechanism</h2></div>
+    <p class="lede">Volume&nbsp;I's argument is a single chain, run from the commodity to the reproduction of the whole system. Click any box to jump to its entry in the glossary (Folio&nbsp;IV).</p>
+
+    <figure class="diagram">
+      <svg viewBox="0 0 800 980" role="img" aria-label="Flow diagram: a commodity's value becomes money, money advanced becomes capital via the formula M-C-M', capital buys labour-power, the working day splits into paid necessary labour and unpaid surplus labour, surplus-value is produced absolutely or relatively, and accumulation feeds back into circulation, concentration, and the industrial reserve army.">
+        <defs>
+          <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 z" fill="currentColor"></path>
+          </marker>
+        </defs>
+
+        <g fill="none" stroke="currentColor" stroke-width="1.4" opacity="0.9">
+          <line x1="400" y1="76"  x2="400" y2="123" marker-end="url(#arrow)"></line>
+          <line x1="400" y1="174" x2="400" y2="221" marker-end="url(#arrow)"></line>
+          <line x1="400" y1="280" x2="400" y2="327" marker-end="url(#arrow)"></line>
+          <line x1="400" y1="382" x2="400" y2="429" marker-end="url(#arrow)"></line>
+          <line x1="250" y1="516" x2="250" y2="565" marker-end="url(#arrow)"></line>
+          <line x1="580" y1="516" x2="580" y2="565" marker-end="url(#arrow)"></line>
+          <line x1="520" y1="618" x2="410" y2="657" marker-end="url(#arrow)"></line>
+          <line x1="630" y1="618" x2="655" y2="657" marker-end="url(#arrow)"></line>
+          <line x1="410" y1="718" x2="350" y2="757" marker-end="url(#arrow)"></line>
+          <line x1="662" y1="726" x2="470" y2="757" marker-end="url(#arrow)"></line>
+          <line x1="330" y1="814" x2="260" y2="853" marker-end="url(#arrow)"></line>
+          <line x1="480" y1="814" x2="560" y2="853" marker-end="url(#arrow)"></line>
+        </g>
+
+        <g fill="none" stroke="currentColor" stroke-width="1.1" stroke-dasharray="2 4" opacity="0.85">
+          <path d="M 580,354 L 553,354" marker-end="url(#arrow)"></path>
+        </g>
+        <text class="mono" x="610" y="410" font-size="9.5" fill="currentColor" opacity="0.8" text-anchor="middle">historical precondition &middot; Part VIII</text>
+
+        <g fill="none" stroke="currentColor" stroke-width="1.2" opacity="0.85">
+          <path d="M 150,593 C 62,540 62,430 250,378" marker-end="url(#arrow)"></path>
+        </g>
+        <text class="mono" x="62" y="470" font-size="10.5" fill="currentColor" opacity="0.85" text-anchor="middle" transform="rotate(-90 62 470)">reproduces labour-power</text>
+
+        <g fill="none" stroke="currentColor" stroke-width="1.2" opacity="0.85">
+          <path d="M 280,789 C 22,650 22,340 250,256" marker-end="url(#arrow)"></path>
+        </g>
+        <text class="mono" x="22" y="610" font-size="10.5" fill="currentColor" opacity="0.85" text-anchor="middle" transform="rotate(-90 22 610)">re-enters circulation as more capital</text>
+
+        <g class="node-hit" tabindex="0" role="button" data-term="commodity" aria-label="Jump to glossary: Commodity">
+          <rect x="280" y="20" width="240" height="56" fill="var(--paper-raised)" stroke="currentColor" stroke-width="1.3"></rect>
+          <text x="400" y="43" text-anchor="middle" font-size="13" font-weight="600" fill="currentColor">COMMODITY</text>
+          <text x="400" y="60" text-anchor="middle" font-size="10.5" fill="currentColor" opacity="0.75" font-family="var(--font-mono)">use-value + value</text>
+        </g>
+
+        <g class="node-hit" tabindex="0" role="button" data-term="money" aria-label="Jump to glossary: Money">
+          <rect x="300" y="126" width="200" height="48" fill="var(--paper-raised)" stroke="currentColor" stroke-width="1.3"></rect>
+          <text x="400" y="147" text-anchor="middle" font-size="13" font-weight="600" fill="currentColor">MONEY</text>
+          <text x="400" y="163" text-anchor="middle" font-size="10.5" fill="currentColor" opacity="0.75" font-family="var(--font-mono)">universal equivalent</text>
+        </g>
+
+        <g class="node-hit" tabindex="0" role="button" data-term="capital" aria-label="Jump to glossary: General formula for capital">
+          <rect x="250" y="224" width="300" height="56" fill="var(--paper-raised)" stroke="var(--accent)" stroke-width="2"></rect>
+          <text x="400" y="248" text-anchor="middle" font-size="13.5" font-weight="700" fill="var(--accent-strong)" font-family="var(--font-mono)">CAPITAL &nbsp;M &ndash; C &ndash; M&prime;</text>
+          <text x="400" y="266" text-anchor="middle" font-size="10.5" fill="currentColor" opacity="0.75">value that valorizes itself</text>
+        </g>
+
+        <g class="node-hit" tabindex="0" role="button" data-term="labour-power" aria-label="Jump to glossary: Labour-power">
+          <rect x="250" y="330" width="300" height="52" fill="var(--paper-raised)" stroke="currentColor" stroke-width="1.3"></rect>
+          <text x="400" y="352" text-anchor="middle" font-size="13" font-weight="600" fill="currentColor">LABOUR-POWER</text>
+          <text x="400" y="369" text-anchor="middle" font-size="10.5" fill="currentColor" opacity="0.75" font-family="var(--font-mono)">bought as a commodity</text>
+        </g>
+
+        <g class="node-hit" tabindex="0" role="button" data-term="primitive-accumulation" aria-label="Jump to glossary: Primitive accumulation">
+          <rect x="580" y="316" width="200" height="76" fill="var(--paper-raised)" stroke="currentColor" stroke-width="1" stroke-dasharray="3 3"></rect>
+          <text x="680" y="340" text-anchor="middle" font-size="11.5" font-weight="600" fill="currentColor">PRIMITIVE</text>
+          <text x="680" y="354" text-anchor="middle" font-size="11.5" font-weight="600" fill="currentColor">ACCUMULATION</text>
+          <text x="680" y="371" text-anchor="middle" font-size="9.5" fill="currentColor" opacity="0.75">dispossession from</text>
+          <text x="680" y="383" text-anchor="middle" font-size="9.5" fill="currentColor" opacity="0.75">the land, Part VIII</text>
+        </g>
+
+        <g aria-label="The working day, split into paid and unpaid labour">
+          <rect x="70" y="432" width="360" height="84" fill="var(--paper-raised)" stroke="currentColor" stroke-width="1.3"></rect>
+          <rect x="430" y="432" width="300" height="84" fill="var(--accent)" stroke="var(--accent-strong)" stroke-width="1.3"></rect>
+          <text x="250" y="455" text-anchor="middle" font-size="12.5" font-weight="600" fill="currentColor">NECESSARY LABOUR</text>
+          <text x="250" y="472" text-anchor="middle" font-size="10" fill="currentColor" opacity="0.75" font-family="var(--font-mono)">paid &middot; reproduces the wage</text>
+          <text x="580" y="455" text-anchor="middle" font-size="12.5" font-weight="700" fill="#F7ECE6">SURPLUS LABOUR</text>
+          <text x="580" y="472" text-anchor="middle" font-size="10" fill="#F7ECE6" opacity="0.9" font-family="var(--font-mono)">unpaid &middot; the capitalist's gain</text>
+          <text x="400" y="500" text-anchor="middle" font-size="10.5" fill="currentColor" opacity="0.7" font-family="var(--font-mono)">&mdash; THE WORKING DAY &mdash;</text>
+        </g>
+
+        <g class="node-hit" tabindex="0" role="button" data-term="wages" aria-label="Jump to glossary: Wages">
+          <rect x="150" y="568" width="200" height="50" fill="var(--paper-raised)" stroke="currentColor" stroke-width="1.3"></rect>
+          <text x="250" y="590" text-anchor="middle" font-size="12.5" font-weight="600" fill="currentColor">WAGES</text>
+          <text x="250" y="606" text-anchor="middle" font-size="9.5" fill="currentColor" opacity="0.75" font-family="var(--font-mono)">variable capital, v</text>
+        </g>
+
+        <g class="node-hit" tabindex="0" role="button" data-term="surplus-value" aria-label="Jump to glossary: Surplus-value">
+          <rect x="470" y="568" width="220" height="50" fill="var(--paper-raised)" stroke="var(--accent)" stroke-width="2"></rect>
+          <text x="580" y="590" text-anchor="middle" font-size="12.5" font-weight="700" fill="var(--accent-strong)">SURPLUS-VALUE</text>
+          <text x="580" y="606" text-anchor="middle" font-size="9.5" fill="var(--accent-strong)" opacity="0.85" font-family="var(--font-mono)">s &nbsp;=&nbsp; unpaid labour, realized</text>
+        </g>
+
+        <g class="node-hit" tabindex="0" role="button" data-term="absolute-surplus-value" aria-label="Jump to glossary: Absolute surplus-value">
+          <rect x="300" y="660" width="220" height="58" fill="var(--paper-raised)" stroke="currentColor" stroke-width="1.3"></rect>
+          <text x="410" y="682" text-anchor="middle" font-size="12" font-weight="600" fill="currentColor">ABSOLUTE SURPLUS-VALUE</text>
+          <text x="410" y="698" text-anchor="middle" font-size="9.5" fill="currentColor" opacity="0.75" font-family="var(--font-mono)">lengthen the working day</text>
+          <text x="410" y="710" text-anchor="middle" font-size="9.5" fill="currentColor" opacity="0.75" font-family="var(--font-mono)">Part III</text>
+        </g>
+
+        <g class="node-hit" tabindex="0" role="button" data-term="relative-surplus-value" aria-label="Jump to glossary: Relative surplus-value">
+          <rect x="545" y="660" width="235" height="66" fill="var(--paper-raised)" stroke="currentColor" stroke-width="1.3"></rect>
+          <text x="662" y="680" text-anchor="middle" font-size="12" font-weight="600" fill="currentColor">RELATIVE SURPLUS-VALUE</text>
+          <text x="662" y="696" text-anchor="middle" font-size="9.5" fill="currentColor" opacity="0.75" font-family="var(--font-mono)">raise productivity &middot; Part IV</text>
+          <text x="662" y="708" text-anchor="middle" font-size="9.5" fill="currentColor" opacity="0.75" font-family="var(--font-mono)">co-op &rarr; manufacture &rarr; machinery</text>
+        </g>
+
+        <g class="node-hit" tabindex="0" role="button" data-term="accumulation" aria-label="Jump to glossary: Accumulation of capital">
+          <rect x="280" y="760" width="260" height="54" fill="var(--paper-raised)" stroke="var(--accent)" stroke-width="2"></rect>
+          <text x="410" y="782" text-anchor="middle" font-size="12.5" font-weight="700" fill="var(--accent-strong)">ACCUMULATION OF CAPITAL</text>
+          <text x="410" y="798" text-anchor="middle" font-size="9.5" fill="var(--accent-strong)" opacity="0.85" font-family="var(--font-mono)">surplus-value reconverted into capital</text>
+        </g>
+
+        <g class="node-hit" tabindex="0" role="button" data-term="organic-composition" aria-label="Jump to glossary: Organic composition of capital">
+          <rect x="150" y="856" width="220" height="58" fill="var(--paper-raised)" stroke="currentColor" stroke-width="1.3"></rect>
+          <text x="260" y="878" text-anchor="middle" font-size="11.5" font-weight="600" fill="currentColor">CONCENTRATION &amp;</text>
+          <text x="260" y="893" text-anchor="middle" font-size="11.5" font-weight="600" fill="currentColor">CENTRALIZATION</text>
+          <text x="260" y="907" text-anchor="middle" font-size="9" fill="currentColor" opacity="0.75" font-family="var(--font-mono)">fewer, larger capitals</text>
+        </g>
+
+        <g class="node-hit" tabindex="0" role="button" data-term="reserve-army" aria-label="Jump to glossary: Industrial reserve army">
+          <rect x="430" y="856" width="280" height="66" fill="var(--paper-raised)" stroke="currentColor" stroke-width="1.3"></rect>
+          <text x="570" y="878" text-anchor="middle" font-size="11.5" font-weight="600" fill="currentColor">INDUSTRIAL RESERVE ARMY</text>
+          <text x="570" y="894" text-anchor="middle" font-size="9" fill="currentColor" opacity="0.75" font-family="var(--font-mono)">relative surplus population</text>
+          <text x="570" y="907" text-anchor="middle" font-size="9" fill="currentColor" opacity="0.75" font-family="var(--font-mono)">Part VII, Ch. 25</text>
+        </g>
+      </svg>
+      <figcaption>The chain Volume&nbsp;I traces, Part by Part: a commodity's value becomes money (Part&nbsp;I); money advanced to make more money is capital (Part&nbsp;II); capital buys labour-power, whose working day splits into paid and unpaid time &mdash; the width of the red segment above is illustrative, not fixed, since widening it is exactly what Parts&nbsp;III&ndash;V describe two ways of doing; the resulting surplus-value is reconverted into more capital (Part&nbsp;VII), which both re-enters circulation and produces, as its own by-products, concentrated capitals and an industrial reserve army whose existence keeps wages down. Primitive accumulation (Part&nbsp;VIII, dashed) is not a step in this cycle but its historical precondition: the prior separation of producers from the means of production that made labour-power a commodity in the first place.</figcaption>
+    </figure>
+  </section>
+
+  <!-- ================= FOLIO III ================= -->
+  <section class="folio" id="structure">
+    <div class="folio-head"><span class="num">FOLIO&nbsp;III</span><h2>Contents</h2></div>
+    <p class="lede">Volume&nbsp;I's own table of contents, eight Parts and thirty-three chapters, in the standard English (Moore &amp; Aveling) chapter numbering.</p>
+
+    <div class="toc">
+      <div class="toc-part">
+        <div class="roman">I</div>
+        <h3>Commodities and Money</h3>
+        <ul class="chapters"><li>1. Commodities</li><li>2. The Process of Exchange</li><li>3. Money, or the Circulation of Commodities</li></ul>
+      </div>
+      <div class="toc-part">
+        <div class="roman">II</div>
+        <h3>The Transformation of Money into Capital</h3>
+        <ul class="chapters"><li>4. The General Formula for Capital</li><li>5. Contradictions in the General Formula</li><li>6. The Buying and Selling of Labour-Power</li></ul>
+      </div>
+      <div class="toc-part">
+        <div class="roman">III</div>
+        <h3>The Production of Absolute Surplus-Value</h3>
+        <ul class="chapters"><li>7. Labour-Process &amp; Valorization Process</li><li>8. Constant Capital and Variable Capital</li><li>9. The Rate of Surplus-Value</li><li>10. The Working Day</li><li>11. Rate and Mass of Surplus-Value</li></ul>
+      </div>
+      <div class="toc-part">
+        <div class="roman">IV</div>
+        <h3>Production of Relative Surplus-Value</h3>
+        <ul class="chapters"><li>12. The Concept of Relative Surplus-Value</li><li>13. Co-operation</li><li>14. Division of Labour and Manufacture</li><li>15. Machinery and Modern Industry</li></ul>
+      </div>
+      <div class="toc-part">
+        <div class="roman">V</div>
+        <h3>Absolute and Relative Surplus-Value Combined</h3>
+        <ul class="chapters"><li>16. Absolute and Relative Surplus-Value</li><li>17. Changes of Magnitude in Price of Labour-Power and Surplus-Value</li><li>18. Various Formulae for the Rate of Surplus-Value</li></ul>
+      </div>
+      <div class="toc-part">
+        <div class="roman">VI</div>
+        <h3>Wages</h3>
+        <ul class="chapters"><li>19. Value (Price) of Labour-Power Transformed into Wages</li><li>20. Time-Wages</li><li>21. Piece-Wages</li><li>22. National Differences of Wages</li></ul>
+      </div>
+      <div class="toc-part">
+        <div class="roman">VII</div>
+        <h3>The Process of Accumulation of Capital</h3>
+        <ul class="chapters"><li>23. Simple Reproduction</li><li>24. Conversion of Surplus-Value into Capital</li><li>25. The General Law of Capitalist Accumulation</li></ul>
+      </div>
+      <div class="toc-part">
+        <div class="roman">VIII</div>
+        <h3>The So-Called Primitive Accumulation</h3>
+        <ul class="chapters"><li>26. The Secret of Primitive Accumulation</li><li>27&ndash;30. Expropriation &amp; the Agricultural Revolution</li><li>31. Genesis of the Industrial Capitalist</li><li>32. Historical Tendency of Capitalist Accumulation</li><li>33. The Modern Theory of Colonisation</li></ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= FOLIO IV ================= -->
+  <section class="folio" id="glossary">
+    <div class="folio-head"><span class="num">FOLIO&nbsp;IV</span><h2>Terms</h2></div>
+    <p class="lede">Twenty-three working terms, defined as Volume&nbsp;I uses them. Search to filter; click a term to open it.</p>
+
+    <div class="glossary-tools">
+      <input type="text" id="glossary-filter" placeholder="Filter terms &hellip; e.g. &ldquo;wages&rdquo; or &ldquo;fetish&rdquo;" aria-label="Filter glossary terms">
+      <span class="glossary-count mono" id="glossary-count"></span>
+    </div>
+
+    <dl class="glossary" id="glossary-list">
+      <!-- entries injected as static markup below -->
+    </dl>
+  </section>
+
+  <!-- ================= FOLIO V ================= -->
+  <section class="folio" id="quotes">
+    <div class="folio-head"><span class="num">FOLIO&nbsp;V</span><h2>Entries</h2></div>
+    <p class="lede">Six passages, cited by Part and Chapter rather than page, in the Moore &amp; Aveling translation.</p>
+
+    <div class="ledger-entries">
+      <div class="ledger-entry">
+        <div class="cite">Ch.&nbsp;1<br>&sect;1</div>
+        <blockquote>&ldquo;The wealth of societies in which the capitalist mode of production prevails, presents itself as &lsquo;an immense accumulation of commodities,&rsquo; its unit being a single commodity.&rdquo;</blockquote>
+        <p class="gloss">The opening sentence of the book &mdash; the reason Chapter&nbsp;1 begins with the commodity rather than with money or capital.</p>
+      </div>
+      <div class="ledger-entry">
+        <div class="cite">Ch.&nbsp;1<br>&sect;4</div>
+        <blockquote>&ldquo;A commodity is therefore a mysterious thing, simply because in it the social character of men's labour appears to them as an objective character stamped upon the product of that labour.&rdquo;</blockquote>
+        <p class="gloss">The statement of commodity fetishism: social relations between producers show up as relations between things.</p>
+      </div>
+      <div class="ledger-entry">
+        <div class="cite">Ch.&nbsp;10</div>
+        <blockquote>&ldquo;Capital is dead labour, that, vampire-like, only lives by sucking living labour, and lives the more, the more labour it sucks.&rdquo;</blockquote>
+        <p class="gloss">From the chapter on the working day &mdash; Marx's most quoted line on the relation between capital and living labour.</p>
+      </div>
+      <div class="ledger-entry">
+        <div class="cite">Ch.&nbsp;10</div>
+        <blockquote>&ldquo;Between equal rights, force decides.&rdquo;</blockquote>
+        <p class="gloss">On the standoff between the capitalist's right to lengthen the day and the worker's right to limit it &mdash; Marx's answer to why factory legislation was fought over, not reasoned out.</p>
+      </div>
+      <div class="ledger-entry">
+        <div class="cite">Ch.&nbsp;13</div>
+        <blockquote>&ldquo;It is not because he is a leader of industry that a man is a capitalist; on the contrary, he is a leader of industry because he is a capitalist.&rdquo;</blockquote>
+        <p class="gloss">From the chapter on co-operation, on the authority of capital over the labour process, derived from ownership rather than the reverse.</p>
+      </div>
+      <div class="ledger-entry">
+        <div class="cite">Ch.&nbsp;24</div>
+        <blockquote>&ldquo;Accumulate, accumulate! That is Moses and the prophets!&rdquo;</blockquote>
+        <p class="gloss">On the conversion of surplus-value into capital &mdash; accumulation for its own sake, as the classical economists' first commandment.</p>
+      </div>
+    </div>
+  </section>
+
+  <footer class="colophon">
+    Compendium to Karl Marx, <em>Capital</em>, Volume&nbsp;I (1867) &middot; Moore &amp; Aveling translation, standard chapter numbering &middot; prepared as a reading companion, not a substitute for the text.
+  </footer>
+
+</div>
+
+<script>
+(function(){
+  var GLOSSARY = [
+    { id:"commodity", term:"Commodity", def:"An external object that satisfies a human want (its use-value) and is also a bearer of exchange-value. Marx opens Volume I here because the commodity is capitalist wealth's “elementary form.”", xref:["use-value","value"] },
+    { id:"use-value", term:"Use-value", def:"The utility of a thing, given by its physical properties; it is realized only in use or consumption and says nothing, on its own, about how much of anything else it exchanges for.", xref:["commodity","exchange-value"] },
+    { id:"exchange-value", term:"Exchange-value", def:"The quantitative ratio in which use-values of one kind exchange for use-values of another kind. For Marx it is only the “form of appearance” of something else — value.", xref:["value","commodity"] },
+    { id:"value", term:"Value", def:"The socially necessary abstract labour-time congealed in a commodity. Exchange-value is how value shows up on the market; value is what exchange-value expresses.", xref:["abstract-labour","exchange-value"] },
+    { id:"abstract-labour", term:"Abstract labour (socially necessary labour-time)", def:"Labour counted simply as an expenditure of human labour-power in general, measured by the time an average worker needs, at the normal level of skill and intensity for a given society.", xref:["value"] },
+    { id:"fetishism", term:"Commodity fetishism", def:"The way that, once production is generalized commodity production, social relations between producers appear as relations between things — prices, market movements — rather than as what they actually are: relations between people, mediated by their labour.", xref:["commodity","money"] },
+    { id:"money", term:"Money", def:"The commodity that has become the universal equivalent — the one thing in which the value of every other commodity is expressed and against which every other commodity can be directly exchanged.", xref:["value","capital"] },
+    { id:"capital", term:"General formula for capital (M–C–M′)", def:"Money advanced to buy a commodity in order to sell it again for more money. This is what distinguishes capital from simple commodity circulation (C–M–C, selling in order to buy) — capital is value in motion to expand itself.", xref:["money","surplus-value"] },
+    { id:"labour-power", term:"Labour-power", def:"The worker's capacity to labour, sold as a commodity for a wage. Its distinguishing use-value, for the buyer, is that consuming it — putting it to work — creates more value than it costs to reproduce.", xref:["wages","surplus-value","primitive-accumulation"] },
+    { id:"constant-capital", term:"Constant capital (c)", def:"The portion of capital laid out on means of production — raw materials, buildings, machinery. Its value is transferred to the product during production but is not itself increased in the process.", xref:["variable-capital","organic-composition"] },
+    { id:"variable-capital", term:"Variable capital (v)", def:"The portion of capital laid out on labour-power. Unlike constant capital, it reproduces its own value and adds a further, unpaid increment — which is why Marx calls it “variable.”", xref:["wages","surplus-value"] },
+    { id:"surplus-value", term:"Surplus-value (s)", def:"The value labour-power creates beyond what is needed to reproduce its own value — appropriated by the capitalist without payment. It is the source Marx identifies for profit, rent, and interest alike.", xref:["variable-capital","accumulation"] },
+    { id:"rate-of-surplus-value", term:"Rate of surplus-value (s/v)", def:"What Marx calls “the exact expression for the degree of exploitation of labour-power by capital” — the ratio of surplus labour-time to necessary labour-time within the working day.", xref:["surplus-value","working-day"] },
+    { id:"working-day", term:"The working day", def:"The length of the day labour-power is put to work, split into necessary labour-time (which reproduces the wage) and surplus labour-time (which produces surplus-value). Its legal limitation, fought over across nineteenth-century Factory Acts, is documented at length in Chapter 10.", xref:["rate-of-surplus-value","absolute-surplus-value"] },
+    { id:"absolute-surplus-value", term:"Absolute surplus-value", def:"Surplus-value produced by lengthening the working day beyond necessary labour-time, with productivity held constant.", xref:["working-day","relative-surplus-value"] },
+    { id:"relative-surplus-value", term:"Relative surplus-value", def:"Surplus-value produced by shortening necessary labour-time — not by working people longer, but by raising productivity so the goods workers need to live on take less labour to produce. Part IV traces this through co-operation, manufacture, and machinery.", xref:["absolute-surplus-value","working-day"] },
+    { id:"cooperation", term:"Co-operation / manufacture / machinery", def:"The historical stages, in Part IV, by which capital raises productivity: many workers labouring together under one command; the detailed division of labour inside a single workshop; and, finally, machinery and the factory system of Modern Industry.", xref:["relative-surplus-value"] },
+    { id:"wages", term:"Wages", def:"The “transformed form” in which the value, or price, of labour-power appears on the market — as payment for labour performed, which obscures the paid/unpaid split running through the actual working day.", xref:["labour-power","working-day"] },
+    { id:"simple-reproduction", term:"Simple reproduction", def:"The repetition of the production process on an unchanged scale. Marx uses it to argue that, given enough repetitions, even the capital a capitalist started with is traceable to unpaid surplus labour extracted along the way.", xref:["accumulation"] },
+    { id:"accumulation", term:"Accumulation of capital", def:"The reconversion of surplus-value into additional capital, rather than its consumption as revenue. “Accumulate, accumulate! That is Moses and the prophets,” as Marx puts it in Chapter 24.", xref:["surplus-value","organic-composition","reserve-army"] },
+    { id:"organic-composition", term:"Organic composition of capital", def:"The ratio of constant to variable capital (c : v), read as reflecting the technical make-up of production. A rising composition, as accumulation proceeds, is central to Marx's account in Chapter 25 of accumulation's effect on employment.", xref:["constant-capital","reserve-army"] },
+    { id:"reserve-army", term:"Industrial reserve army (relative surplus population)", def:"The pool of unemployed and under-employed workers that capitalist accumulation itself continually produces — disciplining wages among those in work and supplying labour on demand for expansion.", xref:["accumulation","wages"] },
+    { id:"primitive-accumulation", term:"Primitive (“original”) accumulation", def:"The historical process — enclosures, the expropriation of peasants from the land, colonial plunder — that separated producers from the means of production, creating capital on one side and, on the other, a class with nothing to sell but its own labour-power. Part VIII treats it as history, not as a step the cycle repeats.", xref:["labour-power"] }
+  ];
+
+  var byId = {};
+  GLOSSARY.forEach(function(e){ byId[e.id] = e; });
+
+  var list = document.getElementById('glossary-list');
+  var frag = document.createDocumentFragment();
+
+  GLOSSARY.forEach(function(entry){
+    var wrap = document.createElement('div');
+    wrap.className = 'entry';
+    wrap.id = 'term-' + entry.id;
+    wrap.setAttribute('data-open', 'false');
+    wrap.setAttribute('data-search', (entry.term + ' ' + entry.def).toLowerCase());
+
+    var btn = document.createElement('button');
+    btn.className = 'entry-head';
+    btn.setAttribute('aria-expanded', 'false');
+    btn.innerHTML = '<dt>' + entry.term + '</dt><span class="sym mono">+</span>';
+
+    var dd = document.createElement('dd');
+    dd.hidden = true;
+    var xrefHtml = '';
+    if (entry.xref && entry.xref.length){
+      xrefHtml = '<span class="xref">' + entry.xref.map(function(x){
+        var t = byId[x];
+        return t ? '<a class="xref-chip" href="#term-' + x + '" data-xref="' + x + '">' + t.term.split(' (')[0].split(',')[0] + '</a>' : '';
+      }).join('') + '</span>';
+    }
+    dd.innerHTML = '<p>' + entry.def + '</p>' + xrefHtml;
+
+    btn.addEventListener('click', function(){
+      var isOpen = wrap.getAttribute('data-open') === 'true';
+      wrap.setAttribute('data-open', String(!isOpen));
+      btn.setAttribute('aria-expanded', String(!isOpen));
+      dd.hidden = isOpen;
+    });
+
+    wrap.appendChild(btn);
+    wrap.appendChild(dd);
+    frag.appendChild(wrap);
+  });
+  list.appendChild(frag);
+
+  function openTerm(id){
+    var el = document.getElementById('term-' + id);
+    if (!el) return;
+    el.setAttribute('data-open', 'true');
+    el.querySelector('.entry-head').setAttribute('aria-expanded', 'true');
+    el.querySelector('dd').hidden = false;
+    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    el.classList.remove('flash');
+    void el.offsetWidth;
+    el.classList.add('flash');
+  }
+
+  list.addEventListener('click', function(ev){
+    var chip = ev.target.closest('.xref-chip');
+    if (chip){
+      ev.preventDefault();
+      openTerm(chip.getAttribute('data-xref'));
+    }
+  });
+
+  document.querySelectorAll('.node-hit').forEach(function(node){
+    var term = node.getAttribute('data-term');
+    function go(){ openTerm(term); }
+    node.addEventListener('click', go);
+    node.addEventListener('keydown', function(ev){
+      if (ev.key === 'Enter' || ev.key === ' '){ ev.preventDefault(); go(); }
+    });
+  });
+
+  var filterInput = document.getElementById('glossary-filter');
+  var countEl = document.getElementById('glossary-count');
+  function applyFilter(){
+    var q = filterInput.value.trim().toLowerCase();
+    var shown = 0;
+    document.querySelectorAll('#glossary-list .entry').forEach(function(el){
+      var match = !q || el.getAttribute('data-search').indexOf(q) !== -1;
+      el.hidden = !match;
+      if (match) shown++;
+    });
+    countEl.textContent = shown + ' / ' + GLOSSARY.length;
+  }
+  filterInput.addEventListener('input', applyFilter);
+  applyFilter();
+
+  var railLinks = Array.prototype.slice.call(document.querySelectorAll('.rail a'));
+  var sections = railLinks.map(function(a){ return document.getElementById(a.getAttribute('data-target')); });
+  function setActive(){
+    var pos = window.scrollY + 140;
+    var current = sections[0];
+    sections.forEach(function(s){ if (s && s.offsetTop <= pos) current = s; });
+    railLinks.forEach(function(a){
+      a.classList.toggle('active', current && a.getAttribute('data-target') === current.id);
+    });
+  }
+  window.addEventListener('scroll', setActive, { passive: true });
+  setActive();
+})();
+</script>
